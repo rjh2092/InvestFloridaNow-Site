@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prime St. Augustine Location</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <style>
+    :root {
+      --bg: #f2ede3;
+      --ink: #22180e;
+      --ink-soft: #756044;
+      --line: #c0b09a;
+      --muted: #9a8462;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #e8dfd1;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      font-family: "Jost", sans-serif;
+      color: var(--ink);
+    }
+
+    .canvas {
+      width: min(100%, 1400px);
+      aspect-ratio: 11 / 8.5;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .canvas::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border: 0.85px solid var(--line);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .header {
+      text-align: center;
+      padding: 28px 80px 18px;
+      z-index: 20;
+      position: relative;
+    }
+
+    .eyebrow {
+      font-weight: 300;
+      font-size: clamp(8px, 0.7vw, 11px);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(30px, 2.5vw, 42px);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .title em { font-style: italic; color: #58451e; }
+
+    .rule {
+      width: 52px;
+      height: 0.85px;
+      background: var(--line);
+      margin: 12px auto 10px;
+    }
+
+    .address {
+      font-size: clamp(9px, 0.8vw, 13px);
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .map-wrap {
+      margin: 0 56px 0;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border: 0.85px solid var(--line);
+    }
+
+    #map { width: 100%; height: 100%; }
+
+    .map-wash {
+      position: absolute;
+      inset: 0;
+      background: rgba(210, 185, 130, 0.13);
+      pointer-events: none;
+      z-index: 500;
+    }
+
+    .map-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 46%, transparent 44%, rgba(242, 237, 227, 0.58) 100%);
+      pointer-events: none;
+      z-index: 501;
+    }
+
+    .callouts {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 700;
+    }
+
+    .co {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .co.right {
+      flex-direction: row-reverse;
+      text-align: right;
+    }
+
+    .co-card {
+      min-width: 190px;
+      background: rgba(242, 237, 227, 0.95);
+      border: 0.7px solid var(--line);
+      padding: 10px 14px;
+    }
+
+    .co-name {
+      display: block;
+      font-size: clamp(10px, 0.78vw, 12px);
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .co-time {
+      display: block;
+      margin-top: 2px;
+      font-family: "Cormorant Garamond", serif;
+      font-style: italic;
+      font-size: clamp(13px, 1vw, 17px);
+      color: var(--ink-soft);
+      line-height: 1.1;
+    }
+
+    .co svg { width: 58px; height: 12px; overflow: visible; flex-shrink: 0; }
+
+    .c-i95 { left: 16px; top: 22%; }
+    .c-vilano { right: 16px; top: 18%; }
+    .c-historic { right: 16px; top: 42%; }
+    .c-us1 { right: 16px; top: 67%; }
+
+    .footer {
+      padding: 10px 60px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 20;
+      position: relative;
+    }
+
+    .f-brand {
+      font-family: "Cormorant Garamond", serif;
+      font-weight: 300;
+      font-size: clamp(11px, 0.8vw, 14px);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .f-note {
+      font-size: clamp(8px, 0.62vw, 11px);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: #ad9f84;
+      text-align: right;
+      line-height: 1.7;
+    }
+
+    .leaflet-control-zoom,
+    .leaflet-control-attribution { display: none !important; }
+
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #22180e;
+      border: 2.5px solid #f2ede3;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 2;
+    }
+
+    .pin-ring {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(34, 24, 14, 0.45);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 2.8s ease-out infinite;
+    }
+
+    @keyframes ripple {
+      0% { transform: translate(-50%, -50%) scale(0.45); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(2.9); opacity: 0; }
+    }
+
+    .prop-label {
+      background: rgba(34, 24, 14, 0.92);
+      color: #f2ede3;
+      font-family: "Jost", sans-serif;
+      font-weight: 400;
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      white-space: nowrap;
+    }
+
+    .dest-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #8b6f3a;
+      border: 2px solid rgba(242, 237, 227, 0.9);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+    }
+
+    @page {
+      size: 11in 8.5in;
+      margin: 0;
+    }
+
+    @media print {
+      body { padding: 0; background: none; }
+      .canvas {
+        width: 11in;
+        height: 8.5in;
+        aspect-ratio: auto;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <header class="header">
+      <div class="eyebrow">St. Augustine · Florida · 32084</div>
+      <h1 class="title">Prime St. Augustine <em>Location</em></h1>
+      <div class="rule"></div>
+      <div class="address">521 Lake Sinclair St · St. Augustine, FL 32084</div>
+    </header>
+
+    <section class="map-wrap">
+      <div id="map"></div>
+      <div class="map-wash"></div>
+      <div class="map-vignette"></div>
+
+      <div class="callouts">
+        <div class="co c-i95">
+          <div class="co-card">
+            <span class="co-name">I-95 Exit 318</span>
+            <span class="co-time">~10 Minutes</span>
+          </div>
+          <svg>
+            <line x1="0" y1="6" x2="54" y2="6" stroke="#9A8462" stroke-width="0.75" />
+            <circle cx="54" cy="6" r="2.2" fill="#9A8462" />
+          </svg>
+        </div>
+
+        <div class="co right c-vilano">
+          <div class="co-card">
+            <span class="co-name">Vilano Beach</span>
+            <span class="co-time">~15–18 Minutes</span>
+          </div>
+          <svg>
+            <line x1="4" y1="6" x2="58" y2="6" stroke="#9A8462" stroke-width="0.75" />
+            <circle cx="4" cy="6" r="2.2" fill="#9A8462" />
+          </svg>
+        </div>
+
+        <div class="co right c-historic">
+          <div class="co-card">
+            <span class="co-name">Historic District</span>
+            <span class="co-time">~10–12 Minutes</span>
+          </div>
+          <svg>
+            <line x1="4" y1="6" x2="58" y2="6" stroke="#9A8462" stroke-width="0.75" />
+            <circle cx="4" cy="6" r="2.2" fill="#9A8462" />
+          </svg>
+        </div>
+
+        <div class="co right c-us1">
+          <div class="co-card">
+            <span class="co-name">US-1 Corridor</span>
+            <span class="co-time">~5–7 Minutes</span>
+          </div>
+          <svg>
+            <line x1="4" y1="6" x2="58" y2="6" stroke="#9A8462" stroke-width="0.75" />
+            <circle cx="4" cy="6" r="2.2" fill="#9A8462" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="f-brand">St. Augustine · Northeast Florida</div>
+      <div class="f-note">
+        Map data © OpenStreetMap contributors · © CARTO · Drive times are estimates · For illustrative brochure use
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const property = [29.8897, -81.3751];
+    const points = {
+      i95: [29.9020, -81.4290],
+      vilano: [29.9117, -81.3083],
+      historic: [29.8972, -81.3130],
+      us1: [29.8897, -81.3155]
+    };
+
+    const map = L.map('map', {
+      center: [29.902, -81.35],
+      zoom: 12,
+      zoomControl: false,
+      attributionControl: false,
+      scrollWheelZoom: false,
+      dragging: false,
+      doubleClickZoom: false,
+      touchZoom: false,
+      keyboard: false
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 20,
+      opacity: 1
+    }).addTo(map);
+
+    const destIcon = L.divIcon({
+      className: '',
+      html: '<div class="dest-dot"></div>',
+      iconSize: [8, 8],
+      iconAnchor: [4, 4]
+    });
+
+    Object.values(points).forEach((coords) => {
+      L.marker(coords, { icon: destIcon }).addTo(map);
+    });
+
+    L.marker(property, {
+      icon: L.divIcon({
+        className: '',
+        html: '<div style="position:relative;width:14px;height:14px;"><div class="pin-ring"></div><div class="pin-dot"></div></div>',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      })
+    }).addTo(map);
+
+    L.marker(property, {
+      icon: L.divIcon({
+        className: '',
+        html: '<div class="prop-label">521 Lake Sinclair St</div>',
+        iconSize: [180, 24],
+        iconAnchor: [-14, 21]
+      })
+    }).addTo(map);
+  </script>
+</body>
+</html>
