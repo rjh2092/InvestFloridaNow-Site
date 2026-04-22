@@ -11,18 +11,28 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <style>
     :root {
-      --bg: #f2ede3;
-      --ink: #22180e;
-      --ink-soft: #756044;
-      --line: #c0b09a;
-      --muted: #9a8462;
+      /* BHHS palette */
+      --cabernet: #670038;
+      --white: #ffffff;
+      --espresso: #2a2223;
+      --earth: #72595e;
+      --dove: #aa979c;
+      --pearl: #f5f1f2;
+      --rose: #ece3e5;
+      --blush: #c299af;
+
+      --bg: var(--pearl);
+      --ink: var(--espresso);
+      --ink-soft: var(--earth);
+      --line: #d7cace;
+      --muted: var(--dove);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      background: #e8dfd1;
+      background: #efe7e9;
       display: grid;
       place-items: center;
       padding: 20px;
@@ -74,7 +84,7 @@
       color: var(--ink);
     }
 
-    .title em { font-style: italic; color: #58451e; }
+    .title em { font-style: italic; color: var(--cabernet); }
 
     .rule {
       width: 52px;
@@ -104,7 +114,7 @@
     .map-wash {
       position: absolute;
       inset: 0;
-      background: rgba(210, 185, 130, 0.13);
+      background: rgba(194, 153, 175, 0.10);
       pointer-events: none;
       z-index: 500;
     }
@@ -112,7 +122,7 @@
     .map-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at 50% 46%, transparent 44%, rgba(242, 237, 227, 0.58) 100%);
+      background: radial-gradient(ellipse at 50% 46%, transparent 44%, rgba(245, 241, 242, 0.62) 100%);
       pointer-events: none;
       z-index: 501;
     }
@@ -138,7 +148,7 @@
 
     .co-card {
       min-width: 190px;
-      background: rgba(242, 237, 227, 0.95);
+      background: rgba(245, 241, 242, 0.95);
       border: 0.7px solid var(--line);
       padding: 10px 14px;
     }
@@ -149,7 +159,7 @@
       font-weight: 500;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--ink);
+      color: var(--cabernet);
     }
 
     .co-time {
@@ -158,7 +168,7 @@
       font-family: "Cormorant Garamond", serif;
       font-style: italic;
       font-size: clamp(13px, 1vw, 17px);
-      color: var(--ink-soft);
+      color: var(--earth);
       line-height: 1.1;
     }
 
@@ -191,7 +201,7 @@
       font-size: clamp(8px, 0.62vw, 11px);
       font-weight: 300;
       letter-spacing: 0.1em;
-      color: #ad9f84;
+      color: var(--dove);
       text-align: right;
       line-height: 1.7;
     }
@@ -203,8 +213,8 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: #22180e;
-      border: 2.5px solid #f2ede3;
+      background: var(--cabernet);
+      border: 2.5px solid var(--pearl);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
       position: relative;
       z-index: 2;
@@ -215,7 +225,7 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      border: 1px solid rgba(34, 24, 14, 0.45);
+      border: 1px solid rgba(103, 0, 56, 0.35);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -228,8 +238,8 @@
     }
 
     .prop-label {
-      background: rgba(34, 24, 14, 0.92);
-      color: #f2ede3;
+      background: rgba(42, 34, 35, 0.93);
+      color: var(--pearl);
       font-family: "Jost", sans-serif;
       font-weight: 400;
       font-size: 8px;
@@ -243,8 +253,8 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #8b6f3a;
-      border: 2px solid rgba(242, 237, 227, 0.9);
+      background: var(--earth);
+      border: 2px solid rgba(245, 241, 242, 0.92);
       box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
     }
 
@@ -285,8 +295,8 @@
             <span class="co-time">~10 Minutes</span>
           </div>
           <svg>
-            <line x1="0" y1="6" x2="54" y2="6" stroke="#9A8462" stroke-width="0.75" />
-            <circle cx="54" cy="6" r="2.2" fill="#9A8462" />
+            <line x1="0" y1="6" x2="54" y2="6" stroke="#72595E" stroke-width="0.75" />
+            <circle cx="54" cy="6" r="2.2" fill="#72595E" />
           </svg>
         </div>
 
@@ -296,8 +306,8 @@
             <span class="co-time">~15–18 Minutes</span>
           </div>
           <svg>
-            <line x1="4" y1="6" x2="58" y2="6" stroke="#9A8462" stroke-width="0.75" />
-            <circle cx="4" cy="6" r="2.2" fill="#9A8462" />
+            <line x1="4" y1="6" x2="58" y2="6" stroke="#72595E" stroke-width="0.75" />
+            <circle cx="4" cy="6" r="2.2" fill="#72595E" />
           </svg>
         </div>
 
@@ -307,8 +317,8 @@
             <span class="co-time">~10–12 Minutes</span>
           </div>
           <svg>
-            <line x1="4" y1="6" x2="58" y2="6" stroke="#9A8462" stroke-width="0.75" />
-            <circle cx="4" cy="6" r="2.2" fill="#9A8462" />
+            <line x1="4" y1="6" x2="58" y2="6" stroke="#72595E" stroke-width="0.75" />
+            <circle cx="4" cy="6" r="2.2" fill="#72595E" />
           </svg>
         </div>
 
@@ -318,8 +328,8 @@
             <span class="co-time">~5–7 Minutes</span>
           </div>
           <svg>
-            <line x1="4" y1="6" x2="58" y2="6" stroke="#9A8462" stroke-width="0.75" />
-            <circle cx="4" cy="6" r="2.2" fill="#9A8462" />
+            <line x1="4" y1="6" x2="58" y2="6" stroke="#72595E" stroke-width="0.75" />
+            <circle cx="4" cy="6" r="2.2" fill="#72595E" />
           </svg>
         </div>
       </div>
@@ -334,16 +344,21 @@
   </main>
 
   <script>
-    const property = [29.8897, -81.3751];
+    // Destination coordinates adjusted to be on-land reference points for brochure context.
+    const property = [29.8899, -81.3749];
     const points = {
-      i95: [29.9020, -81.4290],
-      vilano: [29.9117, -81.3083],
-      historic: [29.8972, -81.3130],
-      us1: [29.8897, -81.3155]
+      // I-95 / SR-16 interchange (Exit 318)
+      i95: [29.9022, -81.4300],
+      // Vilano Beach Town Center (land-side)
+      vilano: [29.9226, -81.2997],
+      // Historic District core (Plaza de la Constitución area)
+      historic: [29.8913, -81.3124],
+      // US-1 corridor at N Ponce de Leon Blvd & SR-16 area
+      us1: [29.9058, -81.3189]
     };
 
     const map = L.map('map', {
-      center: [29.902, -81.35],
+      center: [29.9028, -81.3505],
       zoom: 12,
       zoomControl: false,
       attributionControl: false,
