@@ -258,6 +258,19 @@
       box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
     }
 
+    .dest-tag {
+      font-family: "Jost", sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cabernet);
+      background: rgba(245, 241, 242, 0.95);
+      border: 0.8px solid #d7cace;
+      padding: 3px 7px;
+      white-space: nowrap;
+      box-shadow: 0 1px 4px rgba(42, 34, 35, 0.15);
+    }
     @page {
       size: 11in 8.5in;
       margin: 0;
@@ -348,13 +361,13 @@
     const property = [29.8899, -81.3749];
     const points = {
       // I-95 / SR-16 interchange (Exit 318)
-      i95: [29.9022, -81.4300],
+      i95: { coords: [29.9022, -81.4300], label: 'I-95 Exit 318', anchor: [8, -8] },
       // Vilano Beach Town Center (land-side)
-      vilano: [29.9226, -81.2997],
+      vilano: { coords: [29.9226, -81.2997], label: 'Vilano Beach', anchor: [8, -8] },
       // Historic District core (Plaza de la Constitución area)
-      historic: [29.8913, -81.3124],
+      historic: { coords: [29.8913, -81.3124], label: 'Historic District', anchor: [8, -8] },
       // US-1 corridor at N Ponce de Leon Blvd & SR-16 area
-      us1: [29.9058, -81.3189]
+      us1: { coords: [29.9058, -81.3189], label: 'US-1 Corridor', anchor: [8, -8] }
     };
 
     const map = L.map('map', {
@@ -382,8 +395,16 @@
       iconAnchor: [4, 4]
     });
 
-    Object.values(points).forEach((coords) => {
-      L.marker(coords, { icon: destIcon }).addTo(map);
+    const tagIcon = (label, anchor = [8, -8]) => L.divIcon({
+      className: '',
+      html: `<div class="dest-tag">${label}</div>`,
+      iconSize: [120, 22],
+      iconAnchor: anchor
+    });
+
+    Object.values(points).forEach((point) => {
+      L.marker(point.coords, { icon: destIcon }).addTo(map);
+      L.marker(point.coords, { icon: tagIcon(point.label, point.anchor) }).addTo(map);
     });
 
     L.marker(property, {
